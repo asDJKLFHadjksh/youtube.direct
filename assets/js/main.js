@@ -1,12 +1,27 @@
 const animationContainer = document.getElementById("loading-animation");
 
-const targetUrl =
-  window.redirectConfig && typeof window.redirectConfig.targetUrl === "string"
-    ? window.redirectConfig.targetUrl
-    : "";
+const getTargetUrls = () => {
+  if (!window.redirectConfig) {
+    return [];
+  }
 
-const targetUrlLink = document.getElementById("target-url");
-const targetUrlText = document.getElementById("target-url-text");
+  if (Array.isArray(window.redirectConfig.targetUrls)) {
+    return window.redirectConfig.targetUrls.filter(
+      (url) => typeof url === "string" && url.trim().length > 0
+    );
+  }
+
+  if (typeof window.redirectConfig.targetUrl === "string") {
+    return [window.redirectConfig.targetUrl];
+  }
+
+  return [];
+};
+
+const targetUrls = getTargetUrls();
+
+const targetUrlList = document.getElementById("target-url-list");
+const cancelLink = document.getElementById("cancel-link");
 const canonicalLink = document.getElementById("canonical-link");
 
 const formatDisplayUrl = (url) => {
@@ -18,16 +33,24 @@ const formatDisplayUrl = (url) => {
   }
 };
 
-if (targetUrlLink && targetUrl) {
-  targetUrlLink.setAttribute("href", targetUrl);
+if (canonicalLink && targetUrls.length > 0) {
+  canonicalLink.setAttribute("href", targetUrls[0]);
 }
 
-if (canonicalLink && targetUrl) {
-  canonicalLink.setAttribute("href", targetUrl);
-}
+if (targetUrlList && targetUrls.length > 0) {
+  targetUrls.forEach((url) => {
+    const link = document.createElement("a");
+    link.className = "button";
+    link.href = url;
+    link.rel = "noopener noreferrer";
+    link.textContent = formatDisplayUrl(url);
 
-if (targetUrlText && targetUrl) {
-  targetUrlText.textContent = formatDisplayUrl(targetUrl);
+    if (cancelLink && cancelLink.parentElement === targetUrlList) {
+      targetUrlList.insertBefore(link, cancelLink);
+    } else {
+      targetUrlList.appendChild(link);
+    }
+  });
 }
 
 if (animationContainer && window.lottie) {
