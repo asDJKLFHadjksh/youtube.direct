@@ -1,3 +1,3 @@
 window.redirectConfig = {
-  targetUrl: "https://x.com/kuhyakuya",
+  targetUrl: "https://www.youtube.com/@KuhyaKuya",
 };
